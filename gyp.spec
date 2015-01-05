@@ -2,7 +2,7 @@
 
 Name:		gyp
 Version:	0.1
-Release:	0.1%{?revision:.%{revision}svn}
+Release:	0.2%{?revision:.%{revision}svn}
 Summary:	Generate Your Projects
 
 Group:		Development/Python
@@ -19,7 +19,7 @@ URL:		http://code.google.com/p/gyp/
 Source0:	%{name}-%{version}-svn%{revision}.tar.bz2
 Patch0:		gyp-rpmoptflags.patch
 
-BuildRequires:	python-devel
+BuildRequires:	python2-devel
 BuildArch:	noarch
 
 %description
@@ -39,14 +39,14 @@ for i in $(find pylib -name '*.py'); do
 done
 
 %build
-%{__python} setup.py build
+python2 setup.py build
 
 
 %install
-%{__python} setup.py install --root $RPM_BUILD_ROOT --skip-build
+python2 setup.py install --root $RPM_BUILD_ROOT --skip-build
 
 
 %files
 %doc AUTHORS LICENSE
 %{_bindir}/gyp
-%{python_sitelib}/*
+%{python2_sitelib}/*
