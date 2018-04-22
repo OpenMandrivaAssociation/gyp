@@ -25,6 +25,7 @@ Patch1:		gyp-ninja-build.patch
 
 BuildRequires:	python2-devel
 BuildRequires:	python2-setuptools
+BuildRequires:	python2-pkg-resources
 Requires:	python2-setuptools
 BuildArch:	noarch
 
