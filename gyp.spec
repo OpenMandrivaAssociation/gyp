@@ -1,11 +1,14 @@
-%global		revision	1617
+%global		revision	920ee58
+%{expand:	%%global	archivename	gyp-%{version}%{?revision:-git%{revision}}}
+%{!?python2_sitelib: %global python2_sitelib %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
+%{!?python2_sitearch: %global python2_sitearch %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
 
 Name:		gyp
 Version:	0.1
-Release:	0.2%{?revision:.%{revision}svn}
+Release:	0.25%{?revision:.%{revision}git}%{?dist}
 Summary:	Generate Your Projects
 
-Group:		Development/Python
+Group:		Development/Tools
 License:	BSD
 URL:		http://code.google.com/p/gyp/
 # No released tarball avaiable. so the tarball was generated
@@ -14,12 +17,15 @@ URL:		http://code.google.com/p/gyp/
 # 1. svn co http://gyp.googlecode.com/svn/trunk gyp
 # 2. cd gyp
 # 3. version=$(grep version= setup.py|cut -d\' -f2)
-# 4. revision=$(svn info|grep -E "^Revision:"|cut -d' ' -f2)
-# 5. tar -a --exclude-vcs -cf /tmp/gyp-$version-svn$revision.tar.bz2 *
-Source0:	%{name}-%{version}-svn%{revision}.tar.bz2
+# 4. revision=$(git log --oneline|head -1|cut -d' ' -f1)
+# 5. tar -a --exclude-vcs -cf /tmp/gyp-$version-git$revision.tar.bz2 *
+Source0:	%{archivename}.tar.bz2
 Patch0:		gyp-rpmoptflags.patch
+Patch1:		gyp-ninja-build.patch
 
 BuildRequires:	python2-devel
+BuildRequires:	python2-setuptools
+Requires:	python2-setuptools
 BuildArch:	noarch
 
 %description
@@ -32,19 +38,19 @@ irreconcilable differences.
 
 
 %prep
-%setup -q -c -n %{name}-%{version}-svn%{revision}
+%setup -q -c -n %{archivename}
 %patch0 -p1 -b .0-rpmoptflags
+%patch1 -p1  -b .1-ninja-build
 for i in $(find pylib -name '*.py'); do
 	sed -e '\,#![ \t]*/.*python,{d}' $i > $i.new && touch -r $i $i.new && mv $i.new $i
 done
 
 %build
-python2 setup.py build
+%{__python2} setup.py build
 
 
 %install
-python2 setup.py install --root $RPM_BUILD_ROOT --skip-build
-
+%{__python2} setup.py install --root $RPM_BUILD_ROOT --skip-build
 
 %files
 %doc AUTHORS LICENSE
