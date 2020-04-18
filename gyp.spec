@@ -1,33 +1,33 @@
-%global		revision	920ee58
-%{expand:	%%global	archivename	gyp-%{version}%{?revision:-git%{revision}}}
-%{!?python2_sitelib: %global python2_sitelib %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
-%{!?python2_sitearch: %global python2_sitearch %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
+# from https://chromium.googlesource.com/external/gyp/
+%define date		20190716
+%define commit		fcd686f1880fa52a1ee78d3e98af1b88cb334528
 
 Name:		gyp
 Version:	0.1
-Release:	0.25%{?revision:.%{revision}git}%{?dist}
+Release:	0.26%{?revision:.%{revision}git}%{?dist}
 Summary:	Generate Your Projects
 
 Group:		Development/Tools
 License:	BSD
 URL:		http://code.google.com/p/gyp/
+
 # No released tarball avaiable. so the tarball was generated
-# from svn as following:
+# from git as following:
 #
-# 1. svn co http://gyp.googlecode.com/svn/trunk gyp
+# 1. git clone https://chromium.googlesource.com/external/gyp.git
 # 2. cd gyp
 # 3. version=$(grep version= setup.py|cut -d\' -f2)
-# 4. revision=$(git log --oneline|head -1|cut -d' ' -f1)
-# 5. tar -a --exclude-vcs -cf /tmp/gyp-$version-git$revision.tar.bz2 *
-Source0:	%{archivename}.tar.bz2
+# 4. revision=$(svn info|grep -E "^Revision:"|cut -d' ' -f2)
+# 5. tar -a --exclude-vcs -cf /tmp/gyp-$version-svn$revision.tar.bz2 *
+Source0:	https://chromium.googlesource.com/external/gyp/+archive/%{commit}.tar.gz
 Patch0:		gyp-rpmoptflags.patch
-Patch1:		gyp-ninja-build.patch
+Patch2:		gyp-python3.patch
+Patch3:		gyp-python38.patch
 
-BuildRequires:	python2-devel
-BuildRequires:	python2-setuptools
-BuildRequires:	python2-pkg-resources
-Requires:	python2-setuptools
 BuildArch:	noarch
+BuildRequires:	pkgconfig(python3)
+BuildRequires:	python3dist(setuptools)
+Requires:	python3dist(setuptools)
 
 %description
 GYP is a tool to generates native Visual Studio, Xcode and SCons
@@ -39,21 +39,19 @@ irreconcilable differences.
 
 
 %prep
-%setup -q -c -n %{archivename}
-%patch0 -p1 -b .0-rpmoptflags
-%patch1 -p1  -b .1-ninja-build
+%autosetup -p1 -c -n %{commit}
+
 for i in $(find pylib -name '*.py'); do
 	sed -e '\,#![ \t]*/.*python,{d}' $i > $i.new && touch -r $i $i.new && mv $i.new $i
 done
 
 %build
-%{__python2} setup.py build
-
+%py3_build
 
 %install
-%{__python2} setup.py install --root $RPM_BUILD_ROOT --skip-build
+%py3_install
 
 %files
 %doc AUTHORS LICENSE
 %{_bindir}/gyp
-%{python2_sitelib}/*
+%{python3_sitelib}/*
