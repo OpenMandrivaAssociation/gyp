@@ -20,9 +20,11 @@ URL:		http://code.google.com/p/gyp/
 # 4. revision=$(svn info|grep -E "^Revision:"|cut -d' ' -f2)
 # 5. tar -a --exclude-vcs -cf /tmp/gyp-$version-svn$revision.tar.bz2 *
 Source0:	https://chromium.googlesource.com/external/gyp/+archive/%{commit}.tar.gz
-Patch0:		gyp-rpmoptflags.patch
-Patch2:		gyp-python3.patch
-Patch3:		gyp-python38.patch
+Patch0:         gyp-rpmoptflags.patch
+Patch1:         gyp-ninja-build.patch
+Patch2:         gyp-python3.patch
+Patch3:         gyp-python38.patch
+Patch4:         gyp-fix-cmake.patch
 
 BuildArch:	noarch
 BuildRequires:	pkgconfig(python3)
