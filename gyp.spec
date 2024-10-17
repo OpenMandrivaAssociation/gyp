@@ -9,7 +9,7 @@ Summary:	Generate Your Projects
 
 Group:		Development/Tools
 License:	BSD
-URL:		http://code.google.com/p/gyp/
+URL:		https://code.google.com/p/gyp/
 
 # No released tarball avaiable. so the tarball was generated
 # from git as following:
